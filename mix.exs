@@ -2,7 +2,7 @@ defmodule Mokay.MixProject do
   use Mix.Project
 
   @app :mokay
-  @version "0.1.0"
+  @version "0.1.1"
   @all_targets [:rpi, :rpi0, :rpi2, :rpi3, :rpi3a, :rpi4, :bbb, :x86_64]
 
   def project do
@@ -40,6 +40,7 @@ defmodule Mokay.MixProject do
     [
       # Dependencies for all targets
       {:nerves, "~> 1.6.3", runtime: false},
+      {:nerves_hub_cli, "~> 0.10", runtime: false},
       {:shoehorn, "~> 0.6.0"},
       {:ring_logger, "~> 0.8.1"},
       {:toolshed, "~> 0.2.13"},
@@ -49,6 +50,8 @@ defmodule Mokay.MixProject do
       {:nerves_pack, "~> 0.4.0", targets: @all_targets},
       {:bmp280, "~> 0.2", targets: @all_targets},
       {:circuits_gpio, "~> 0.4", targets: @all_targets},
+      {:nerves_hub_link, "~> 0.9", targets: @all_targets},
+      {:nerves_time, "~> 0.4", targets: @all_targets},
 
       # Dependencies for specific targets
       {:nerves_system_rpi, "~> 1.12", runtime: false, targets: :rpi},
