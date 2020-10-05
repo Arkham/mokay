@@ -12,9 +12,7 @@ defmodule Mokay.Application do
 
     children =
       [
-        # Children for all targets
-        # Starts a worker by calling: Mokay.Worker.start_link(arg)
-        # {Mokay.Worker, arg},
+        {Mokay.Server, []}
       ] ++ children(target())
 
     Supervisor.start_link(children, opts)

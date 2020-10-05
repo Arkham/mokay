@@ -43,6 +43,7 @@ defmodule Mokay.MixProject do
       {:shoehorn, "~> 0.6.0"},
       {:ring_logger, "~> 0.8.1"},
       {:toolshed, "~> 0.2.13"},
+      {:bmp280, "~> 0.2"},
 
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.11.3", targets: @all_targets},
@@ -56,7 +57,7 @@ defmodule Mokay.MixProject do
       {:nerves_system_rpi3a, "~> 1.12", runtime: false, targets: :rpi3a},
       {:nerves_system_rpi4, "~> 1.12", runtime: false, targets: :rpi4},
       {:nerves_system_bbb, "~> 2.7", runtime: false, targets: :bbb},
-      {:nerves_system_x86_64, "~> 1.12", runtime: false, targets: :x86_64},
+      {:nerves_system_x86_64, "~> 1.12", runtime: false, targets: :x86_64}
     ]
   end
 
