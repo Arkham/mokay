@@ -13,8 +13,12 @@ defmodule Mokay.Switch do
     {:ok, %{gpio: gpio}}
   end
 
-  def handle_info({:circuits_gpio, pin, _timestamp, value}, state) do
-    IO.puts("Pin #{pin} switched to #{value}")
+  def handle_info({:circuits_gpio, @gpio_pin, _timestamp, 1}, state) do
+    Mokay.Server.button_pressed()
+    {:noreply, state}
+  end
+
+  def handle_info(_msg, state) do
     {:noreply, state}
   end
 end

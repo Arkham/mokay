@@ -13,7 +13,8 @@ defmodule Mokay.Application do
     children =
       [
         {Mokay.Sensor, []},
-        {Mokay.Switch, []}
+        {Mokay.Switch, []},
+        {Mokay.Server, []}
       ] ++ children(target())
 
     Supervisor.start_link(children, opts)
