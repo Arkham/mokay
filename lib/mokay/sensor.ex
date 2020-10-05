@@ -32,6 +32,7 @@ defmodule Mokay.Sensor do
         _ ->
           state
       end
+
     Process.send_after(self(), :read_sensor, @update_interval)
     {:noreply, new_state}
   end
