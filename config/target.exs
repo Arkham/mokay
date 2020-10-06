@@ -63,11 +63,6 @@ config :vintage_net,
   regulatory_domain: "US",
   config: [
     {"usb0", %{type: VintageNetDirect}},
-    {"eth0",
-     %{
-       type: VintageNetEthernet,
-       ipv4: %{method: :dhcp}
-     }},
     {"wlan0",
      %{
        type: VintageNetWiFi,
