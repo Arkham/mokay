@@ -1,26 +1,29 @@
 defmodule Mokay.Server do
   @moduledoc """
   <pre>
-     ┌────────────────┐                       ┌────────────────┐
-     │                │                       │                │
-     │      Idle      │◀───────SMS sent───────│  Sending SMS   │
-     │                │                       │                │
-     └────────────────┘                       └────────────────┘
-              │                                        ▲
-              │                                        │
-              │                                        │
-     Button pressed                                    │
-              │                                        │
-              │                                        │
-              ▼                                        │
-     ┌────────────────┐                                │
-     │                │                                │
-     │    Checking    │      Humidity level            │
-  ┌──│    Humidity    │◀─┬───────reached───────────────┘
-  │  │                │  │
+              ┌────────────────Giving up────────────┐┌──Retry──┐
+              │                                     ││         │
+              ▼                                     │▼         │
+     ┌────────────────┐                    ┌────────────────┐  │
+     │                │                    │                │  │
+     │      Idle      │◀───────SMS sent────│  Sending SMS   │──┘
+     │                │                    │                │
+     └────────────────┘                    └────────────────┘
+              │                                     ▲
+              │                                     │
+              │                                     │
+     Button pressed                                 │
+              │                                     │
+              ▼                                     │
+     ┌────────────────┐                             │
+     │                │                             │
+     │    Checking    │                             │
+  ┌──│    Humidity    │──────Humidity level ────────┘
+  │  │                │◀─┐       reached
   │  └────────────────┘  │
   │                      │
-  └───Humidity level ────┘
+  └──────────────────────┘
+      Humidity level
             low
   </pre>
   """
@@ -29,6 +32,8 @@ defmodule Mokay.Server do
 
   @humidity_difference 15.0
   @humidity_interval 500
+  @sms_interval 1_000
+  @sms_retries 5
 
   # Public API
 
@@ -42,6 +47,13 @@ defmodule Mokay.Server do
 
   # Internals
 
+  @doc """
+  Possible states:
+
+  - :idle
+  - {:checking_humidity, initial_humidity}
+  - {:sending_sms, retries}
+  """
   def init(_) do
     {:ok, %{status: :idle}}
   end
@@ -60,21 +72,27 @@ defmodule Mokay.Server do
   def handle_info(:check_humidity, %{status: {:checking_humidity, initial_humidity}} = state) do
     if get_humidity() - initial_humidity > @humidity_difference do
       send(self(), :send_sms)
+      {:noreply, %{state | status: {:sending_sms, 0}}}
     else
       Process.send_after(self(), :check_humidity, @humidity_interval)
+      {:noreply, state}
     end
-
-    {:noreply, state}
   end
 
-  def handle_info(:send_sms, %{status: {:checking_humidity, _}} = state) do
-    IO.puts("SENDING SMS")
-    Process.send_after(self(), :sms_sent, 5_000)
-    {:noreply, %{state | status: :sending_sms}}
+  def handle_info(:send_sms, %{status: {:sending_sms, retries}} = state)
+      when retries <= @sms_retries do
+    case send_sms() do
+      {:ok, _} ->
+        {:noreply, %{state | status: :idle}}
+
+      {:error, reason} ->
+        IO.puts(reason)
+        Process.send_after(self(), :send_sms, @sms_interval)
+        {:noreply, %{state | status: {:sending_sms, retries + 1}}}
+    end
   end
 
-  def handle_info(:sms_sent, %{status: :sending_sms} = state) do
-    IO.puts("SMS SENT!")
+  def handle_info(:send_sms, %{status: {:sending_sms, _}} = state) do
     {:noreply, %{state | status: :idle}}
   end
 
@@ -85,4 +103,9 @@ defmodule Mokay.Server do
   # Helpers
 
   defp get_humidity(), do: Mokay.Sensor.humidity()
+
+  defp send_sms() do
+    config = Mokay.Application.config()
+    Mokay.SMS.send(config.twilio)
+  end
 end

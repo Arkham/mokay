@@ -40,4 +40,8 @@ defmodule Mokay.Application do
   def target() do
     Application.get_env(:mokay, :target)
   end
+
+  def config() do
+    Application.get_env(:mokay, :config)
+  end
 end

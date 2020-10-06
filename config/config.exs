@@ -5,7 +5,16 @@
 # is restricted to this project.
 import Config
 
-config :mokay, target: Mix.target()
+config :mokay,
+  target: Mix.target(),
+  config: %{
+    twilio: %{
+      from: System.get_env("TWILIO_FROM"),
+      to: System.get_env("TWILIO_TO"),
+      sid: System.get_env("TWILIO_SID"),
+      auth_token: System.get_env("TWILIO_AUTH_TOKEN")
+    }
+  }
 
 # Customize non-Elixir parts of the firmware. See
 # https://hexdocs.pm/nerves/advanced-configuration.html for details.
