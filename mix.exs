@@ -44,7 +44,7 @@ defmodule Mokay.MixProject do
       {:shoehorn, "~> 0.6.0"},
       {:ring_logger, "~> 0.8.1"},
       {:toolshed, "~> 0.2.13"},
-      {:bmp280, "~> 0.2"},
+      {:elixir_bme680, "~> 0.2"},
       {:httpoison, "~> 1.7"},
       {:jason, "~> 1.2"},
 

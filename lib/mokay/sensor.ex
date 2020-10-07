@@ -1,8 +1,8 @@
 defmodule Mokay.Sensor do
   use GenServer
 
-  @update_interval 1_000
-  @i2c_device "i2c-1"
+  @update_interval 500
+  @i2c_device 1
   @i2c_address 0x76
 
   def start_link(_) do
@@ -18,15 +18,15 @@ defmodule Mokay.Sensor do
   end
 
   def init(_) do
-    {:ok, sensor} = BMP280.start_link(bus_name: @i2c_device, bus_address: @i2c_address)
+    {:ok, sensor} = Bme280.start_link(i2c_device_number: @i2c_device, i2c_address: @i2c_address)
     Process.send_after(self(), :read_sensor, 0)
     {:ok, %{sensor: sensor, temperature: 0, humidity: 0}}
   end
 
   def handle_info(:read_sensor, %{sensor: sensor} = state) do
     new_state =
-      case BMP280.read(sensor) do
-        {:ok, %BMP280.Measurement{humidity_rh: h, temperature_c: t}} ->
+      case Bme280.measure(sensor) do
+        %Bme280.Measurement{humidity: h, temperature: t} ->
           %{state | humidity: h, temperature: t}
 
         _ ->
