@@ -52,6 +52,7 @@ defmodule Mokay.MixProject do
       {:nerves_runtime, "~> 0.11.3", targets: @all_targets},
       {:nerves_pack, "~> 0.4.0", targets: @all_targets},
       {:circuits_gpio, "~> 0.4", targets: @all_targets},
+      {:circuits_i2c, "~> 0.3", targets: @all_targets},
       {:nerves_hub_link, "~> 0.9", targets: @all_targets},
       {:nerves_time, "~> 0.4", targets: @all_targets},
 
