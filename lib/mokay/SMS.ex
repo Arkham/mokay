@@ -9,7 +9,7 @@ defmodule Mokay.SMS do
       {:ok, %HTTPoison.Response{status_code: 201, body: body}} ->
         case Jason.decode(body) do
           {:ok, json} ->
-            if Enum.member?([nil, "failed", "undelivered"], json.status) do
+            if Enum.member?([nil, "failed", "undelivered"], Map.get(json, "status")) do
               {:error, "Error sending sms, response body was:\n#{body}"}
             else
               {:ok, json}
