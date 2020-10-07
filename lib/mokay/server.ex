@@ -83,6 +83,7 @@ defmodule Mokay.Server do
       when retries <= @sms_retries do
     case send_sms() do
       {:ok, _} ->
+        IO.puts("SMS SENT, BACK TO IDLE")
         {:noreply, %{state | status: :idle}}
 
       {:error, reason} ->
@@ -93,6 +94,7 @@ defmodule Mokay.Server do
   end
 
   def handle_info(:send_sms, %{status: {:sending_sms, _}} = state) do
+    IO.puts("FAILED TO SEND SMS, BACK TO IDLE")
     {:noreply, %{state | status: :idle}}
   end
 
