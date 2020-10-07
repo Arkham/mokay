@@ -29,6 +29,7 @@ defmodule Mokay.Server do
   """
 
   use GenServer
+  require Logger
 
   @humidity_difference 15.0
   @humidity_interval 500
@@ -59,7 +60,7 @@ defmodule Mokay.Server do
   end
 
   def handle_cast(:button_pressed, %{status: :idle} = state) do
-    IO.puts("BUTTON PRESSED")
+    Logger.info("BUTTON PRESSED")
     send(self(), :check_humidity)
     initial_humidity = get_humidity()
     {:noreply, %{state | status: {:checking_humidity, initial_humidity}}}
@@ -83,18 +84,18 @@ defmodule Mokay.Server do
       when retries <= @sms_retries do
     case send_sms() do
       {:ok, _} ->
-        IO.puts("SMS SENT, BACK TO IDLE")
+        Logger.info("SMS SENT, BACK TO IDLE")
         {:noreply, %{state | status: :idle}}
 
       {:error, reason} ->
-        IO.puts(reason)
+        Logger.info(reason)
         Process.send_after(self(), :send_sms, @sms_interval)
         {:noreply, %{state | status: {:sending_sms, retries + 1}}}
     end
   end
 
   def handle_info(:send_sms, %{status: {:sending_sms, _}} = state) do
-    IO.puts("FAILED TO SEND SMS, BACK TO IDLE")
+    Logger.info("FAILED TO SEND SMS, BACK TO IDLE")
     {:noreply, %{state | status: :idle}}
   end
 
